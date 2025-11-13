@@ -44,7 +44,7 @@ export class EmployeeController {
     return this.employee.findAll(query);
   }
 
-  @Get(':id')
+  @Get('/findEmployee/:id')
   @ApiOperation({ summary: 'Get employee by ID' })
   @ApiOkResponse({
     example: {
@@ -71,7 +71,7 @@ export class EmployeeController {
     return this.employee.create(dto);
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
   @ApiOperation({ summary: 'Update a employee' })
   update(@Param('id') id: string, @Body() dto: CreateEmployeeDto) {
     return this.employee.update(id, dto);
