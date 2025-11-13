@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String        @db.VarChar(100)
+  username     String        @unique @db.VarChar(16)
+  password     String
+  email        String        @unique @db.VarChar(50)
+  phone        String        @db.VarChar(16)
+  address      String
+  created_by   String        @db.VarChar(16)
+  created_date DateTime      @default(now()) @db.Timestamp(6)
+  update_by    String?       @db.VarChar(16)
+  update_date  DateTime?     @db.Timestamp(6)
+  delete_by    String?       @db.VarChar(16)
+  delete_date  DateTime?     @db.Timestamp(6)
+  is_deleted   Int           @default(0)
+  employee     Employee?     @relation(fields: [employee_id], references: [id])
+  city         City?         @relation(fields: [city_id], references: [id])
+  province     Province?     @relation(fields: [province_id], references: [id])
+  country      Country       @relation(fields: [country_id], references: [id])
+  user_company UserCompany[]
+  user_role    UserRole[]
+  city_id      String?
+  province_id  String?
+  country_id   String
+  employee_id  String
+
+  @@map("users")
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  name         String        @db.VarChar(100)
+  code         String?       @db.VarChar(5)
+  created_by   String        @db.VarChar(16)
+  created_date DateTime      @default(now()) @db.Timestamp(6)
+  update_by    String?       @db.VarChar(16)
+  update_date  DateTime?     @db.Timestamp(6)
+  delete_by    String?       @db.VarChar(16)
+  delete_date  DateTime?     @db.Timestamp(6)
+  is_deleted   Int           @default(0)
+  user_company UserCompany[]
+  user_role    UserRole[]
+
+  @@map("companies")
+}
+
+model Employee {
+  id           String    @id @default(uuid())
+  name         String    @db.VarChar(100)
+  code         String    @db.VarChar(5)
+  created_by   String?   @db.VarChar(16)
+  created_date DateTime  @default(now()) @db.Timestamp(6)
+  update_by    String?   @db.VarChar(16)
+  update_date  DateTime? @db.Timestamp(6)
+  delete_by    String?   @db.VarChar(16)
+  delete_date  DateTime? @db.Timestamp(6)
+  is_deleted   Int       @default(0)
+  users        User[]
+
+  @@map("employees")
+}
+
+model Position {
+  id           String        @id @default(uuid())
+  name         String        @db.VarChar
+  user_company UserCompany[]
+
+  @@map("positions")
+}
+
+model City {
+  id    String @id @default(uuid())
+  name  String @db.VarChar
+  users User[]
+
+  @@map("cities")
+}
+
+model Country {
+  id    String @id @default(uuid())
+  name  String @db.VarChar
+  users User[]
+
+  @@map("countries")
+}
+
+model Province {
+  id    String @id @default(uuid())
+  name  String @db.VarChar
+  users User[]
+
+  @@map("provinces")
+}
+
+model Role {
+  id        String     @id @default(uuid())
+  nama      String     @db.VarChar(50)
+  user_role UserRole[]
+
+  @@map("roles")
+}
+
+model UserCompany {
+  user        User     @relation(fields: [user_id], references: [id])
+  user_id     String
+  company     Company  @relation(fields: [company_id], references: [id])
+  company_id  String
+  position    Position @relation(fields: [position_id], references: [id])
+  position_id String
+
+  @@id([user_id, company_id, position_id])
+  @@map("user_company")
+}
+
+model UserRole {
+  user       User    @relation(fields: [user_id], references: [id])
+  user_id    String
+  company    Company @relation(fields: [company_id], references: [id])
+  company_id String
+  role       Role    @relation(fields: [role_id], references: [id])
+  role_id    String
+
+  @@id([user_id, company_id, role_id])
+  @@map("user_role")
+}
